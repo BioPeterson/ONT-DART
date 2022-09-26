@@ -58,7 +58,7 @@ Visualization of output results from this processing pipeline are part of the fr
 
 	1	barcode (e.g. barcode01)
 	2	sample type (sample or control)
-	3	<org>,<amplicon_id> (e.g. ***REMOVED***,***REMOVED***)
+	3	<org>,<amplicon_id>
 	4	amplicon aligned read count (INT)
 	5	proportion of flowcell total aligned reads
 	6	detection after T2: 1 if amplicon count >2% total aligned read count, 0 if not
@@ -72,7 +72,7 @@ Visualization of output results from this processing pipeline are part of the fr
 			if col6==1 && col9==0	positive	true positive, amplicon detected in sample but not control
 			if col6==1 && col9==1	negative	amplicon detected in sample and control
 	11	org code (e.g. ***REMOVED***, FT)
-	12	organism full name (e.g. ***REMOVED***, ***REMOVED***)
+	12	organism full name (Genus species)
 	13	organism detection; 1 if all organism-associated amplicons are 'positive' (col10), 0 if not
 	14	number of organism associated amplicons
 	15	mean org associated amplicon read count
@@ -80,8 +80,8 @@ Visualization of output results from this processing pipeline are part of the fr
 #### SECONDARY OUTPUT FORMAT: org.tsv
 
 	1	barcode
-	2	org code (e.g. ***REMOVED***, FT)
-	3	org full name (e.g. ***REMOVED***, ***REMOVED***)
+	2	org code
+	3	org full name (Genus species)
 	4	detection (1 if all 'org associated amplicons are positive', 0 if not)
 	5	number of organism associated amplicons
 	6	mean org associated amplicon read count
