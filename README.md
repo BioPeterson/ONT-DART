@@ -88,6 +88,10 @@ Visualization of output results from this processing pipeline are part of the fr
 
 ## usage:
 
+1. Provide blast database of organim sequences for alignment. 
+
+2. Update organisms.sh to correspond to barcodes and names of organisms.
+
 `bash nanomonitor.sh -t <INT> -a <INT> -i <DIR> -n <01-12> -r <FNA> -o <DIR>`
 
 #### Args:
