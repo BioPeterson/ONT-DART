@@ -19,7 +19,7 @@ will not be monitoring this repository for any merge requests/issues/etc.
 The code as provided has also been modified to include a different set of amplicons than the original paper
 presents.
 
-# nanoDART
+# ONT-DART
 _nanopore Detection of Amplicons in Real-Time_
 
 The scripts in this repository are designed for a very specific amplicon use-case, and are part of the nanoDART (nanopore Detection of Amplicons in Real-Time) analysis pipeline.
@@ -102,14 +102,10 @@ Visualization of output results from this processing pipeline are part of the fr
 
 #### Example:
 	
-first, start a nanosimulator run:
-
-    bash nanosimulator.sh -t 4 -i /data/seqdata/phase2/analysis_RMS-20200414/nativebarcoding_FLG/20200114_GXB01192_PHASE2-NB_FLG001-BA/BA_NB_Flongle/20200114_1957_X1_ABR474_dac2eaf0/fastq_pass/ -m 1 -s 10 -o ~/sandbox/testing_sim
-
-then run nanomonitor:
+run nanomonitor:
 
     ref="/data/refdata/phase2/amplicons/blastdb_all_amplicons"
-    bash nanomonitor.sh -t 4 -a 20 -i ~/sandbox/testing_sim/fastq_pass/ -n barcode10,barcode11,barcode12 -r "$ref" -o ~/sandbox/testing_dart
+    bash nanomonitor.sh -t 4 -a 20 -i ../fastq_pass/ -n barcode10,barcode11,barcode12 -r "$ref" -o ../testing_dart
 
 
 References:
@@ -117,7 +113,7 @@ References:
 	1. O. Tange (2011): GNU Parallel - The Command-Line Power Tool, ;login: The USENIX Magazine, February 2011:42-47.
     2. Altschul, S.F., Gish, W., Miller, W., Myers, E.W. & Lipman, D.J. (1990) "Basic local alignment search tool." J. Mol. Biol. 215:403-410. https://www.ncbi.nlm.nih.gov/pubmed/2231712?dopt=Citation
 
-## Running nanoDART Web Application in Development
+## Running ONT-DART Web Application in Development
 
 This is for testing out the nanoDART web application on your machine for development purposes.
 
