@@ -71,7 +71,7 @@ Visualization of output results from this processing pipeline are part of the fr
 			if col6==0 && col9==1	negative	amplicon not detected in sample but was detected in control
 			if col6==1 && col9==0	positive	true positive, amplicon detected in sample but not control
 			if col6==1 && col9==1	negative	amplicon detected in sample and control
-	11	org code (e.g. ***REMOVED***, FT)
+	11	org code
 	12	organism full name (Genus species)
 	13	organism detection; 1 if all organism-associated amplicons are 'positive' (col10), 0 if not
 	14	number of organism associated amplicons
