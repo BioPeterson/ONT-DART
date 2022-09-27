@@ -31,17 +31,9 @@
               v-on="on"
               label="Input Directory"
               type="text"
-              ref="inputText"
               :rules="[rules.required]"
               required
             ></v-text-field>
-            <input type="file" ref="file" style="display: none" webkitdirectory multiple>
-
-            <button @click="$refs.file.click()">      <v-btn
-        color="primary"
-        :disabled="!valid">
-        Browse
-      </v-btn></button>
           </template>
           <span>
             The input directory must be the full path to the 'fastq_pass' subfolder of an ONT sequencing run,
@@ -147,10 +139,6 @@ export default {
         }
     }),
     methods: {
-        browseInput() {
-
-        },
-
         startAnalysis() {
           if (!this.$refs.form.validate()) {
             return
