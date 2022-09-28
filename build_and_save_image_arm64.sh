@@ -18,6 +18,6 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 (cd $SCRIPT_DIR/frontend && npm run build)
 cp -r $SCRIPT_DIR/frontend/dist $SCRIPT_DIR/webapp
-docker build $SCRIPT_DIR -t nanodart
-docker buildx build --platform linux/arm64 $SCRIPT_DIR -t nanodart
-docker save nanodart | gzip > nanodart.tar.gz
+docker build $SCRIPT_DIR -t ont-dart
+docker buildx build --platform linux/arm64 $SCRIPT_DIR -t ont-dart
+docker save ont-dart | gzip > ont-dart.tar.gz

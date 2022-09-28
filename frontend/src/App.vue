@@ -24,7 +24,7 @@
         max-width="40"
         contain
       ></v-img>
-      <v-toolbar-title><span style="color:white">nanoDART</span></v-toolbar-title>
+      <v-toolbar-title><span style="color:white">ONT-DART</span></v-toolbar-title>
 
       <v-spacer></v-spacer>
       <v-btn v-for="item in navItems" :key="item.title" :to="item.link" text tile color="white">

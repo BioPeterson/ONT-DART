@@ -22,7 +22,7 @@ module.exports = {
     config
       .plugin('html')
       .tap(args => {
-        args[0].title = "nanoDART"
+        args[0].title = "ONT-DART"
         return args
       })
   }

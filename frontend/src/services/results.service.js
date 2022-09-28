@@ -16,7 +16,7 @@ class ResultsService {
             data: data,
             responseType: 'blob'
         }).then((response) => {
-            fileDownload(response.data, 'nanodart-tables.zip')
+            fileDownload(response.data, 'ont-dart-tables.zip')
         })
     }
 
@@ -27,7 +27,7 @@ class ResultsService {
             data: data,
             responseType: 'blob'
         }).then((response) => {
-            fileDownload(response.data, 'nanodart.pdf')
+            fileDownload(response.data, 'ont-dart.pdf')
         })
     }
 }

@@ -12,7 +12,7 @@ cat << EOF
 Help message for \`nanomonitor.sh\`:
 
 This algorithm is designed for a very specific amplicon use-case, and is part
-of the nanoDART (nanopore Detection of Amplicons in Real-Time) analysis pipeline.
+of the ONT-DART (Oxford Nanopore Technologies Detection of Amplicons in Real-Time) analysis pipeline.
 The input fastq_pass (-i) directory should have subfolders named for barcodes.
 For this use-case, subfolder names are expected to be from 'barcode01' to 'barcode12'.
 

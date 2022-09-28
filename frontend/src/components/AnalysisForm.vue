@@ -130,7 +130,7 @@ export default {
     },
     data: () => ({
         valid: true,
-        inputDirectory: '/app/nanoDART_accessory_files/nanoDART_testdata-20200114_GXB01192_PHASE2-NB_FLG001-BA/BA_NB_Flongle/20200114_1957_X1_ABR474_dac2eaf0/fastq_pass/',
+        inputDirectory: '/app/EXAMPLE/fastq_pass/',
         barcodes: 'barcode10,barcode11,barcode12',
         analysisInterval: '10',
         threads: '1',

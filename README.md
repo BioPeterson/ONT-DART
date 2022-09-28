@@ -20,25 +20,32 @@ The code as provided has also been modified to include a different set of amplic
 presents.
 
 # ONT-DART
-_nanopore Detection of Amplicons in Real-Time_
+_Oxford Nanopore Technologies Detection of Amplicons in Real-Time_
 
-The scripts in this repository are designed for a very specific amplicon use-case, and are part of the nanoDART (nanopore Detection of Amplicons in Real-Time) analysis pipeline.
+The scripts in this repository are designed for a very specific amplicon use-case, and are part of the ONT-DART (Oxford Nanopore Technologies Detection of Amplicons in Real-Time) analysis pipeline.
 The input directory should be the standard Oxford Nanopore Technologies (ONT) MinKNOW software output named `fastq_pass`.
 Each set of reads per barcode within this directory are aligned to an amplicon database with `blastn`.
 The analysis is meant to be in 'real-time', meaning as reads are output from the basecalling algorithm of guppy (or whatever the standard is at the time) into the `fastq_pass` directory, they will be concatentated and analyzed at a user-define interval.
 Visualization of output results from this processing pipeline are part of the front-end GUI application.
 
-### Non-Template Control (NTC) samples:
+## Running ONT-DART Web Application in Development
 
-	Three of the 12 barcodes (01 through 12) are reserved for NTCs.
-	Use (-n) parameter to indicate which barcodes were used for the NTCs (eg. barcode01,barcode02,barcode03).
+This is for testing out the ONT-DART web application on your machine for development purposes.
 
-### Positive detection thresholds will be indicated in comments where they occur:
+Before going through the steps, make sure Docker is installed on your machine: https://docs.docker.com/get-docker/. You'll also need to have access to the ONT-DART accessory files for the blastn database. Copy the ONT-DART accessory files directory into the project's root directory.
 
-	T1. per read alignment thresholds (>=90% alignment identity and length)
-	T2. per sample threshold (>2% total aligned read count)
-	T3. per flow cell threshold (based on NTCs, amplicon called negative if:
-		(NTC mean+(3*stdev)) > (sample count)
+- Open terminal and navigate to the project's root directory.
+- To build the Docker image for ONT-DART, run the following command: `./build_image.sh`. This will properly bundle the frontend and backend web application files together and create a Docker image with the name **ont-dart**.
+- Finally, to run the web application, run the following command: `docker run  -p 5000:5000 ont-dart`. The web application can now be reached at the following URL: http://localhost:5000.
+
+## Installing ONT-DART Web Application to MK1C
+
+Before going through the steps, make sure Docker is installed on your machine: https://docs.docker.com/get-docker/. You'll also need to have access to the ONT-DART accessory files for the blastn database. Copy the ONT-DART accessory files directory into the project's root directory.
+
+- Open terminal and navigate to the project's root directory.
+- To build the Docker image for ONT-DART that is compatible with the MK1C, run the following command: `./build_and_save_image_arm64.sh`. This will generate a file named **ont-dart.tar.gz** in your current directory which is the ONT-DART Docker image that has been saved as a file.
+- Transfer the Docker image file to the MK1C. This can be done through methods like USB or SSH (user: minit, password: minit).
+- Through command line on the MK1C (either directly on the device or through SSH), run the following command: `docker load < /path/to/file/ont-dart.tar.gz`. This will load the ONT-DART Docker image onto the MK1C.
 
 ## NOTES:
 	The target environment for this code is an Oxford Nanopore Technologies (ONT) MinION Mk1C,
@@ -51,6 +58,50 @@ Visualization of output results from this processing pipeline are part of the fr
 	- please index reference fasta with 'makeblastdb -dbtype nucl -in <FNA>'
 	- the input fastq_pass (-i) directory should have subfolders named for barcodes.
     - for this use-case, subfolder names are expected to be from 'barcode01' to 'barcode12'.
+
+## Usage
+
+Upon opening the ONT-DART website, you will be presented with three tabs.
+To begin the process, select the "Analysis" tab.
+
+![](./imgs/analysis.png)
+
+The analysis form requires an input directory, NTC barcodes, analysis interval, and number of threads.
+For more information on these fields, hover over them to see a tooltip description.
+
+Once ready, you can begin the analysis using the "Start" button at the bottom. Next to that is
+the "Stop" button, which will stop the process at any time. An analysis log is provided on the right
+side to display progress.
+
+To view the results, you can select the "Results" tab at the top toolbar.
+
+![heatmap](./imgs/heatmap_01.png)
+
+Hovering over a cell on the heatmap will display the specific read count for an amplicon
+
+![heatmap2](./imgs/heatmap_02.png)
+
+Further below on the results page, a series of tables will display summaries of the detected organisms
+
+![detected-organisms](./imgs/detected-organisms.png)
+
+...as well as read alignments to individual amplicons, and read alignments among NTC barcodes.
+
+![read-alignments](./imgs/read-alignments.png)
+
+# NanoMonitor
+
+### Non-Template Control (NTC) samples:
+
+	Three of the 12 barcodes (01 through 12) are reserved for NTCs.
+	Use (-n) parameter to indicate which barcodes were used for the NTCs (eg. barcode01,barcode02,barcode03).
+
+### Positive detection thresholds will be indicated in comments where they occur:
+
+	T1. per read alignment thresholds (>=90% alignment identity and length)
+	T2. per sample threshold (>2% total aligned read count)
+	T3. per flow cell threshold (based on NTCs, amplicon called negative if:
+		(NTC mean+(3*stdev)) > (sample count)
 
 ## Output
 
@@ -116,22 +167,3 @@ References:
 
 	1. O. Tange (2011): GNU Parallel - The Command-Line Power Tool, ;login: The USENIX Magazine, February 2011:42-47.
     2. Altschul, S.F., Gish, W., Miller, W., Myers, E.W. & Lipman, D.J. (1990) "Basic local alignment search tool." J. Mol. Biol. 215:403-410. https://www.ncbi.nlm.nih.gov/pubmed/2231712?dopt=Citation
-
-## Running ONT-DART Web Application in Development
-
-This is for testing out the nanoDART web application on your machine for development purposes.
-
-Before going through the steps, make sure Docker is installed on your machine: https://docs.docker.com/get-docker/. You'll also need to have access to the nanoDART accessory files for the blastn database. Copy the nanoDART accessory files directory into the project's root directory.
-
-- Open terminal and navigate to the project's root directory.
-- To build the Docker image for nanoDART, run the following command: `./build_image.sh`. This will properly bundle the frontend and backend web application files together and create a Docker image with the name **nanodart**.
-- Finally, to run the web application, run the following command: `docker run  -p 5000:5000 nanodart`. The web application can now be reached at the following URL: http://localhost:5000.
-
-## Installing nanoDART Web Application to MK1C
-
-Before going through the steps, make sure Docker is installed on your machine: https://docs.docker.com/get-docker/. You'll also need to have access to the nanoDART accessory files for the blastn database. Copy the nanoDART accessory files directory into the project's root directory.
-
-- Open terminal and navigate to the project's root directory.
-- To build the Docker image for nanoDART that is compatible with the MK1C, run the following command: `./build_and_save_image_arm64.sh`. This will generate a file named **nanodart.tar.gz** in your current directory which is the nanoDART Docker image that has been saved as a file.
-- Transfer the Docker image file to the MK1C. This can be done through methods like USB or SSH (user: minit, password: minit).
-- Through command line on the MK1C (either directly on the device or through SSH), run the following command: `docker load < /path/to/file/nanodart.tar.gz`. This will load the nanoDART Docker image onto the MK1C.

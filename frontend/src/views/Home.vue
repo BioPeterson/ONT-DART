@@ -18,16 +18,16 @@
   <div>
     <v-row>
       <v-col align="center">
-        <div class="text-h1">nanoDART</div>
+        <div class="text-h1">ONT-DART</div>
         <div class="text-subtitle-2">
-          <u>nano</u>pore <u>D</u>etection of <u>A</u>mplicons in <u>R</u>eal-<u>T</u>ime  
+          <u>Oxford Nanopore Technologies</u> <u>D</u>etection of <u>A</u>mplicons in <u>R</u>eal-<u>T</u>ime  
         </div>
       </v-col>
     </v-row>
     <v-row>
       <v-col>
         <div class="text-body-1">
-          The nanoDART (nanopore Detection of Amplicons in Real-Time) analysis pipeline is used to identify the presence of amplicons
+          The ONT-DART (Oxford Nanopore Technologies Detection of Amplicons in Real-Time) analysis pipeline is used to identify the presence of amplicons
           produced from a multiplex PCR reaction from sequence read output of an Oxford Nanopore Technologies (ONT) sequencing device 
           (e.g. MK1B, MK1C, or GridION). If all amplicon products from a particular organism are above the algorithm's three detection
           thresholds, the organism is flagged as present in the sample.
