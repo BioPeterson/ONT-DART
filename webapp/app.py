@@ -34,7 +34,7 @@ from utils import ORG_FILE, ORG_JSON, PLOT_FILE, PLOT_JSON, NTC_FILE, NTC_JSON, 
 dist_path = os.path.abspath('dist')
 
 nanomonitor_path = Path.cwd().parent / 'nanomonitor.sh'
-ref_directory = '/app/nanoDART_accessory_files/blastn/unencrypted_db/blastdb_all_amplicons'
+ref_directory = '/app/EXAMPLE/Amplicon_blastdb/Amplicon_set'
 
 running_analysis = False
 output_directory: Optional[Path] = None
@@ -52,9 +52,15 @@ def run_nanomonitor(input_directory: Path, barcode_list: str, analysis_interval:
     logs_dir = 'logs'
     os.makedirs(logs_dir, exist_ok=True)
     timestamp = time.strftime('%Y%m%d-%H%M%S')
-    output_directory = input_directory.parent / 'nanodart-output-{}'.format(timestamp)
+    output_directory = input_directory.parent / 'ont-dart-output-{}'.format(timestamp)
     log_file = Path('{}/{}.log'.format(logs_dir, timestamp))
 
+    print(nanomonitor_path)
+    print(num_threads)
+    print(analysis_interval)
+    print(input_directory)
+    print(output_directory)
+    print(ref_directory)
     subprocess.Popen([nanomonitor_path, '-t', num_threads, '-a', analysis_interval,
                       '-i', input_directory, '-n', barcode_list, '-o', output_directory,
                       '-r', ref_directory], stdout=open(log_file, 'wb'), stderr=subprocess.STDOUT)
@@ -64,7 +70,7 @@ def run_nanomonitor(input_directory: Path, barcode_list: str, analysis_interval:
 @app.route('/')
 def index():
     """
-    Generates main index page for nanoDART from template.
+    Generates main index page for ONT-DART from template.
 
     Returns:
         render_template: renders index.html template
@@ -154,7 +160,7 @@ def results_zip():
 
     return send_file(memory_file,
                      mimetype='application/zip',
-                     attachment_filename='nanodart-tables.zip',
+                     attachment_filename='ont-dart-tables.zip',
                      as_attachment=True, cache_timeout=0)
 
 
@@ -170,11 +176,11 @@ def results_pdf():
     options = {'page-size': 'Letter', 'margin-top': '0.75in', 'margin-bottom': '0.75in',
                'margin-left': '0.75in', 'margin-right': '0.75in', 'quiet': ''}
     html_header = '<!doctype html><html lang="en"><head><meta charset="utf-8">' + \
-                  '<title>nanoDART</title></head><body>' + \
-                  '<h1>nanoDART Report: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '</h1>'
+                  '<title>ONT-DART</title></head><body>' + \
+                  '<h1>ONT-DART Report: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '</h1>'
     html_string = html_header + content['html'] + '</body></html>'
     pdf_bytes = pdfkit.from_string(html_string, options=options)
-    return send_file(io.BytesIO(pdf_bytes), attachment_filename='nanodart.pdf', as_attachment=True,
+    return send_file(io.BytesIO(pdf_bytes), attachment_filename='ont-dart.pdf', as_attachment=True,
                      mimetype='application/pdf')
 
 

@@ -422,7 +422,7 @@ export default {
             this.renderHeatmap(this.plot.data)
         },
         downloadGraph() {
-            const config = { filename: 'nanodart_results' };
+            const config = { filename: 'ont-dart_results' };
             d3_save_svg.save(d3.select('svg').node(), config);
         },
         downloadAll() {

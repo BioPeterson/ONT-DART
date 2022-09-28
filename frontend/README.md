@@ -1,4 +1,4 @@
-# nanoDART Frontend
+# ONT-DART Frontend
 
 ## Building for Deployment
 
@@ -29,4 +29,4 @@ See [Configuration Reference](https://cli.vuejs.org/config/). This project uses 
 
 ## Notes
 
-- In order for the nanoDART website to work properly, it's important that the website is deployed on the same machine as the backend shell scripts. This is because the file paths provided to the web page are passed directly to the shell scripts for further processing.
+- In order for the ONT-DART website to work properly, it's important that the website is deployed on the same machine as the backend shell scripts. This is because the file paths provided to the web page are passed directly to the shell scripts for further processing.
