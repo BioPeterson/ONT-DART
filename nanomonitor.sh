@@ -269,7 +269,7 @@ while [[ "$maxtime" -ge "$monitorcounts" ]]; do
         bc=$(basename "$d")
         wd="$OUTDIR/$bc/analysis-at-$monitorcounts-seconds"
         cat "$wd/bc_amp_count_prop_t2.tsv"
-    done | cut -f1 | sort | uniq > "$OUTDIR/uniqamp.list"
+    done | cut -f2 | sort | uniq > "$OUTDIR/uniqamp.list"
     while read uniqamp; do
         grep -P "\t$uniqamp\t" "$nwd/bc_amp_count_prop_t2.tsv" | cut -f3 | awk -v uniqamp="$uniqamp" '{x+=$0; y+=$0^2}END{if(NR==0){printf("NTC\t%s\t%.9f\t%.9f\n",uniqamp, 0, 0)}else{mean=x/NR; std=sqrt(y/NR-(x/NR)^2); printf("NTC\t%s\t%.9f\t%.9f\n",uniqamp, mean,std)}}'
     done < "$OUTDIR/uniqamp.list" > "$nwd/ntc_amp_mean_std.tsv"
@@ -340,7 +340,7 @@ while [[ "$maxtime" -ge "$monitorcounts" ]]; do
 	#5	number of organism associated amplicons
 	#6	mean org associated amplicon read count
 	cut -f1 "$OUTDIR/plot.tmp" | sort | uniq | while read bc; do
-		for org in "$ORGANISM_ID_1" "$ORGANISM_ID_2" "$ORGANISM_ID_3" "$ORGANISM_ID_4" "$ORGANISM_ID_5" "$ORGANISM_ID_6"; do
+		for org in "$ORGANISM_ID_1" "$ORGANISM_ID_2" "$ORGANISM_ID_3" "$ORGANISM_ID_4" "$ORGANISM_ID_5" "$ORGANISM_ID_6" "$ORGANISM_ID_7" "$ORGANISM_ID_8" "$ORGANISM_ID_9"; do
 			d=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | awk '{if($2=="sample"){d=1; if($10=="negative"){d=0}; }else{d=0}; }END{print(d)}');
 			ampcount=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | wc -l);
 			meanrc=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | cut -f4 | awk '{x+=$0}END{printf("%.0f",x/NR)}');
@@ -356,6 +356,12 @@ while [[ "$maxtime" -ge "$monitorcounts" ]]; do
 				printf "$bc\t$org\t$ORGANISM_NAME_5\t$d\t$ampcount\t$meanrc\n";
 			elif [[ "$org" == "$ORGANISM_ID_6" ]]; then
 				printf "$bc\t$org\t$ORGANISM_NAME_6\t$d\t$ampcount\t$meanrc\n";
+			elif [[ "$org" == "$ORGANISM_ID_7" ]]; then
+				printf "$bc\t$org\t$ORGANISM_NAME_7\t$d\t$ampcount\t$meanrc\n";
+			elif [[ "$org" == "$ORGANISM_ID_8" ]]; then
+				printf "$bc\t$org\t$ORGANISM_NAME_8\t$d\t$ampcount\t$meanrc\n";
+			elif [[ "$org" == "$ORGANISM_ID_9" ]]; then
+				printf "$bc\t$org\t$ORGANISM_NAME_9\t$d\t$ampcount\t$meanrc\n";	
 			fi
 		done;
 	done > "$OUTDIR/org.tsv"
@@ -382,6 +388,12 @@ while [[ "$maxtime" -ge "$monitorcounts" ]]; do
 			printf "$plot\t$org\t$ORGANISM_NAME_5\t$d\t$ampcount\t$meanrc\n";
 		elif [[ "$org" == "$ORGANISM_ID_6" ]]; then
 			printf "$plot\t$org\t$ORGANISM_NAME_6\t$d\t$ampcount\t$meanrc\n";
+		elif [[ "$org" == "$ORGANISM_ID_7" ]]; then
+			printf "$plot\t$org\t$ORGANISM_NAME_7\t$d\t$ampcount\t$meanrc\n";
+		elif [[ "$org" == "$ORGANISM_ID_8" ]]; then
+			printf "$plot\t$org\t$ORGANISM_NAME_8\t$d\t$ampcount\t$meanrc\n";
+		elif [[ "$org" == "$ORGANISM_ID_9" ]]; then
+			printf "$plot\t$org\t$ORGANISM_NAME_9\t$d\t$ampcount\t$meanrc\n";
 		fi
 	done > "$OUTDIR/plot.tsv"
 
