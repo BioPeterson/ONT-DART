@@ -28,6 +28,43 @@ Each set of reads per barcode within this directory are aligned to an amplicon d
 The analysis is meant to be in 'real-time', meaning as reads are output from the basecalling algorithm of guppy (or whatever the standard is at the time) into the `fastq_pass` directory, they will be concatentated and analyzed at a user-define interval.
 Visualization of output results from this processing pipeline are part of the front-end GUI application.
 
+## Setting Up Custom Amplicon Sequences Database and `organism.sh` File
+
+This section guides you through the process of setting up a custom database for amplicon sequences and configuring the necessary script files.
+
+### Prerequisites
+
+Before you begin, ensure you have the following installed:
+- `makeblastdb` (part of the BLAST software package)
+
+### Step 1: Create `organism.sh` File
+
+1. **Prepare the file**:
+   - Create a new file named `organism.sh`.
+   - For the format and examples, refer to the `examples_files` directory.
+
+### Step 2: Prepare Amplicon Sequences
+
+1. **Format the fasta headers**:
+   - Each amplicon sequence header should be in the format `>ORGANISM_ID,SEQID`:
+     - `ORGANISM_ID` corresponds to the identifier used in the `organism.sh` file.
+     - `SEQID` should be a unique identifier for the amplicon sequence (avoid spaces; a tested format is `SEQ_NUM`).
+
+### Step 3: Set Up the Database
+
+1. **Create a database directory**:
+   - Choose or create a directory where your database will be stored.
+
+2. **Copy the amplicon fasta file**:
+   - Place your properly formatted fasta file into the newly created database directory.
+
+### Step 4: Generate the Database
+
+1. **Run `makeblastdb`**:
+   - Use the following command to generate your database. Replace `$fasta_file` with the name of your fasta file, and `$database_name` with your desired database name:
+   ```bash
+   makeblastdb -in $fasta_file -out $database_name -dbtype nucl -blastdb_version 4
+
 ## Running ONT-DART Web Application in Development
 
 This is for testing out the ONT-DART web application on your machine for development purposes.
@@ -36,7 +73,7 @@ Before going through the steps, make sure Docker is installed on your machine: h
 
 - Open terminal and navigate to the project's root directory.
 - To build the Docker image for ONT-DART, run the following command: `./build_image.sh`. This will properly bundle the frontend and backend web application files together and create a Docker image with the name **ont-dart**.
-- Finally, to run the web application, run the following command: `docker run  -p 5000:5000 ont-dart`. The web application can now be reached at the following URL: http://localhost:5000.
+- Finally, to run the web application, run the following command (modify port and host url if needed/depending on system): `docker run  -p 5000:5000 ont-dart`. The web application can now be reached at the following URL: http://localhost:5000.
 
 ## Installing ONT-DART Web Application to MK1C
 
@@ -45,7 +82,7 @@ Before going through the steps, make sure Docker is installed on your machine: h
 - Open terminal and navigate to the project's root directory.
 - To build the Docker image for ONT-DART that is compatible with the MK1C, run the following command: `./build_and_save_image_arm64.sh`. This will generate a file named **ont-dart.tar.gz** in your current directory which is the ONT-DART Docker image that has been saved as a file.
 - Transfer the Docker image file to the MK1C. This can be done through methods like USB or SSH (user: minit, password: minit).
-- Through command line on the MK1C (either directly on the device or through SSH), run the following command: `docker load < /path/to/file/ont-dart.tar.gz`. This will load the ONT-DART Docker image onto the MK1C.
+- Through command line on the MK1C (through SSH), run the following command: `docker load < /path/to/file/ont-dart.tar.gz`. This will load the ONT-DART Docker image onto the MK1C.
 
 ## NOTES:
 	The target environment for this code is an Oxford Nanopore Technologies (ONT) MinION Mk1C,
