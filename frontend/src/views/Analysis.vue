@@ -36,7 +36,7 @@
       <v-col cols="6">
         <analysis-log :height="height"></analysis-log>
       </v-col>
-    </v-row>
+    </v-row>    
     <v-row>
       <v-col align="center">
         <v-btn v-if="plot.data.length > 0 && org.data.length > 0" block outlined color="primary" to="/results">
@@ -60,7 +60,7 @@ export default {
   },
   data: () => ({
     alert: false,
-    height: '450px',
+    height: '600px',
     responseType: 'success',
     responseMessage: '',
     plot: store.state.plot,

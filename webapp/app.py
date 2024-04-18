@@ -34,7 +34,7 @@ from utils import ORG_FILE, ORG_JSON, PLOT_FILE, PLOT_JSON, NTC_FILE, NTC_JSON, 
 dist_path = os.path.abspath('dist')
 
 nanomonitor_path = Path.cwd().parent / 'nanomonitor.sh'
-ref_directory = '/app/EXAMPLE/Amplicon_blastdb/Amplicon_set'
+#ref_directory = '/app/DATA/Amplicon_blastdb/Amplicon_set'
 
 running_analysis = False
 output_directory: Optional[Path] = None
@@ -47,7 +47,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 
-def run_nanomonitor(input_directory: Path, barcode_list: str, analysis_interval: str, num_threads: str):
+def run_nanomonitor(input_directory: Path, ref_directory: Path, org_file: Path, barcode_list: str, analysis_interval: str, num_threads: str):
     global running_analysis, output_directory, log_file
     logs_dir = 'logs'
     os.makedirs(logs_dir, exist_ok=True)
@@ -61,9 +61,10 @@ def run_nanomonitor(input_directory: Path, barcode_list: str, analysis_interval:
     print(input_directory)
     print(output_directory)
     print(ref_directory)
+    print(org_file)
     subprocess.Popen([nanomonitor_path, '-t', num_threads, '-a', analysis_interval,
                       '-i', input_directory, '-n', barcode_list, '-o', output_directory,
-                      '-r', ref_directory], stdout=open(log_file, 'wb'), stderr=subprocess.STDOUT)
+                      '-r', ref_directory, '-g', org_file], stdout=open(log_file, 'wb'), stderr=subprocess.STDOUT)
     running_analysis = True
 
 
@@ -89,6 +90,8 @@ def analysis():
 
         content = request.get_json()
         input_directory = Path(content['inputDirectory'])
+        ref_directory = Path(content['refDirectory'])
+        org_file = Path(content['orgFile'])
         barcode_list = content['barcodeList']
         analysis_interval = content['analysisInterval']
         num_threads = content['numThreads']
@@ -102,6 +105,8 @@ def analysis():
 
         if not input_directory.exists():
             error = 'The input directory does not exist.'
+        # elif not ref_directory.exists():
+        #     error = 'The reference directory does not exist.'
         elif not analysis_interval.isnumeric():
             error = 'Invalid interval'
         elif not num_threads.isnumeric():
@@ -109,7 +114,7 @@ def analysis():
         elif not valid_barcodes:
             error = 'Invalid barcodes'
         else:
-            run_nanomonitor(input_directory, barcode_list, analysis_interval, num_threads)
+            run_nanomonitor(input_directory, ref_directory, org_file, barcode_list, analysis_interval, num_threads)
             return jsonify({'message': 'Analysis successfully started'})
 
         return jsonify({'message': error}), 422

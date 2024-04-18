@@ -122,7 +122,7 @@ export -f getavgqual
 #	INPUTS & CHECKS & DEFAULTS
 #===============================================================================
 # parse args
-while getopts "ht:a:i:n:r:o:" OPTION
+while getopts "ht:a:i:n:r:o:g:" OPTION
 do
 	case $OPTION in
 		h) usage; exit 1;;
@@ -132,9 +132,11 @@ do
 		n) NEGATIVE=$OPTARG;;
 		r) REF=$OPTARG;;
 		o) OUTDIR=$OPTARG;;
+		g) ORGANISMS_FILE=$OPTARG;;
 		?) usage; exit;;
 	esac
 done
+
 
 # check args
 if [[ -z "$THREADS" ]]; then printf "%s\n" "Please specify number of threads (-t)."; exit; fi
@@ -146,7 +148,7 @@ if [[ -z "$NEGATIVE" ]]; then printf "%s\n" "Please specify the 3 barcodes used 
 ntc=$(printf "$NEGATIVE" | sed 's/,/\n/g' | sort | uniq | wc -l)
 if [[ "$ntc" != 3 ]]; then
 	printf "%s\n" "3 barcodes must be specified for the NTC set, $ntc were provided"
-	exit
+	#exit
 fi
 # fix formatting (remove white spaces)
 negtmp="$NEGATIVE"
@@ -158,6 +160,8 @@ if [[ ! -f "$REF.nin" ]]; then printf "%s\n" "The reference fasta (-r) has not b
 if [[ ! -f "$REF.nsq" ]]; then printf "%s\n" "The reference fasta (-r) has not been indexed with makeblastdb."; exit; fi
 if [[ -z "$OUTDIR" ]]; then printf "%s\n" "Please specify an output directory (-o)."; exit; fi
 if [[ -d "$OUTDIR" ]]; then printf "%s\n" "The output directory (-o) already exists."; exit; fi
+if [[ -z "$ORGANISMS_FILE" ]]; then printf "%s\n" "Please specify the path to the organisms.sh file (-g)."; exit; fi
+if [[ ! -f "$ORGANISMS_FILE" ]]; then printf "%s\n" "The specified organisms.sh file (-g) does not exist."; exit; fi
 
 # setup defaults
 runtime=$(date +"%Y%m%d%H%M%S%N")
@@ -176,7 +180,8 @@ scriptdir=$(dirname "$absolute_path_of_script")
 #===============================================================================
 
 # Loads organism definitions from organisms.sh
-source $( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )/organisms.sh
+#source $( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )/organisms.sh
+source "$ORGANISMS_FILE"
 
 # don't do anything if barcode dirs do not exist
 if [[ $(find "$INDIR" -maxdepth 1 -type d -name "barcode*") == "" ]]; then
@@ -339,68 +344,51 @@ while [[ "$maxtime" -ge "$monitorcounts" ]]; do
 	#4	detection (1 if all 'org associated amplicons are positive', 0 if not)
 	#5	number of organism associated amplicons
 	#6	mean org associated amplicon read count
+
 	cut -f1 "$OUTDIR/plot.tmp" | sort | uniq | while read bc; do
-		for org in "$ORGANISM_ID_1" "$ORGANISM_ID_2" "$ORGANISM_ID_3" "$ORGANISM_ID_4" "$ORGANISM_ID_5" "$ORGANISM_ID_6" "$ORGANISM_ID_7" "$ORGANISM_ID_8" "$ORGANISM_ID_9"; do
-			d=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | awk '{if($2=="sample"){d=1; if($10=="negative"){d=0}; }else{d=0}; }END{print(d)}');
-			ampcount=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | wc -l);
-			meanrc=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | cut -f4 | awk '{x+=$0}END{printf("%.0f",x/NR)}');
-			if [[ "$org" == "$ORGANISM_ID_1" ]]; then
-				printf "$bc\t$org\t$ORGANISM_NAME_1\t$d\t$ampcount\t$meanrc\n";
-			elif [[ "$org" == "$ORGANISM_ID_2" ]]; then
-				printf "$bc\t$org\t$ORGANISM_NAME_2\t$d\t$ampcount\t$meanrc\n";
-			elif [[ "$org" == "$ORGANISM_ID_3" ]]; then
-				printf "$bc\t$org\t$ORGANISM_NAME_3\t$d\t$ampcount\t$meanrc\n";
-			elif [[ "$org" == "$ORGANISM_ID_4" ]]; then
-				printf "$bc\t$org\t$ORGANISM_NAME_4\t$d\t$ampcount\t$meanrc\n";
-			elif [[ "$org" == "$ORGANISM_ID_5" ]]; then
-				printf "$bc\t$org\t$ORGANISM_NAME_5\t$d\t$ampcount\t$meanrc\n";
-			elif [[ "$org" == "$ORGANISM_ID_6" ]]; then
-				printf "$bc\t$org\t$ORGANISM_NAME_6\t$d\t$ampcount\t$meanrc\n";
-			elif [[ "$org" == "$ORGANISM_ID_7" ]]; then
-				printf "$bc\t$org\t$ORGANISM_NAME_7\t$d\t$ampcount\t$meanrc\n";
-			elif [[ "$org" == "$ORGANISM_ID_8" ]]; then
-				printf "$bc\t$org\t$ORGANISM_NAME_8\t$d\t$ampcount\t$meanrc\n";
-			elif [[ "$org" == "$ORGANISM_ID_9" ]]; then
-				printf "$bc\t$org\t$ORGANISM_NAME_9\t$d\t$ampcount\t$meanrc\n";	
+		for org_id in "${!ORGANISM_ID[@]}"; do
+			org="${ORGANISM_ID[$org_id]}"
+			org_name="${ORGANISM_NAME[$org_id]}"
+
+			count=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | cut -f10 | grep -c 'positive')
+			ampcount=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | wc -l)
+			meanrc=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | cut -f4 | awk '{x+=$0}END{printf("%.0f",x/NR)}')
+			if [ ${count} == ${ampcount} ]; then
+				d=1
+			else
+				d=0
 			fi
-		done;
+
+			printf "$bc\t$org\t$org_name\t$d\t$ampcount\t$meanrc\n";
+		done
 	done > "$OUTDIR/org.tsv"
-
-
 
 	# make primary output: plot.tsv
 	cat "$OUTDIR/plot.tmp" | while read plot; do
 		bc=$(printf "$plot" | cut -f1)
 		org=$(printf "$plot" | cut -f3 | sed 's/,.*//')
 
-		d=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | awk '{if($2=="sample"){d=1; if($10=="negative"){d=0}; }else{d=0}; }END{print(d)}');
-		ampcount=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | wc -l);
-		meanrc=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | cut -f4 | awk '{x+=$0}END{printf("%.0f",x/NR)}');
-		if [[ "$org" == "$ORGANISM_ID_1" ]]; then
-			printf "$plot\t$org\t$ORGANISM_NAME_1\t$d\t$ampcount\t$meanrc\n";
-		elif [[ "$org" == "$ORGANISM_ID_2" ]]; then
-			printf "$plot\t$org\t$ORGANISM_NAME_2\t$d\t$ampcount\t$meanrc\n";
-		elif [[ "$org" == "$ORGANISM_ID_3" ]]; then
-			printf "$plot\t$org\t$ORGANISM_NAME_3\t$d\t$ampcount\t$meanrc\n";
-		elif [[ "$org" == "$ORGANISM_ID_4" ]]; then
-			printf "$plot\t$org\t$ORGANISM_NAME_4\t$d\t$ampcount\t$meanrc\n";
-		elif [[ "$org" == "$ORGANISM_ID_5" ]]; then
-			printf "$plot\t$org\t$ORGANISM_NAME_5\t$d\t$ampcount\t$meanrc\n";
-		elif [[ "$org" == "$ORGANISM_ID_6" ]]; then
-			printf "$plot\t$org\t$ORGANISM_NAME_6\t$d\t$ampcount\t$meanrc\n";
-		elif [[ "$org" == "$ORGANISM_ID_7" ]]; then
-			printf "$plot\t$org\t$ORGANISM_NAME_7\t$d\t$ampcount\t$meanrc\n";
-		elif [[ "$org" == "$ORGANISM_ID_8" ]]; then
-			printf "$plot\t$org\t$ORGANISM_NAME_8\t$d\t$ampcount\t$meanrc\n";
-		elif [[ "$org" == "$ORGANISM_ID_9" ]]; then
-			printf "$plot\t$org\t$ORGANISM_NAME_9\t$d\t$ampcount\t$meanrc\n";
+		# Find the organism name by iterating over the ORGANISM_ID associative array
+		org_name=""
+		for org_id in "${!ORGANISM_ID[@]}"; do
+			if [[ "$org" == "${ORGANISM_ID[$org_id]}" ]]; then
+				org_name="${ORGANISM_NAME[$org_id]}"
+				break
+			fi
+		done
+
+		# The rest of the loop remains the same...
+		count=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | cut -f10 | grep -c 'positive')
+		ampcount=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | wc -l)
+		meanrc=$(grep -P "^$bc\t" "$OUTDIR/plot.tmp" | grep -P "\t$org" | cut -f4 | awk '{x+=$0}END{printf("%.0f",x/NR)}')
+		if [ ${count} == ${ampcount} ]; then
+			d=1
+		else
+			d=0
 		fi
+
+		printf "$plot\t$org\t$org_name\t$d\t$ampcount\t$meanrc\n";
 	done > "$OUTDIR/plot.tsv"
-
-
-
-
-
 
 
 	# make copies of results

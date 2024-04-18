@@ -255,7 +255,7 @@ export default {
             if (chartType === 'arc') {
                 myColor = d3.scaleLinear()
                     .domain([0,1,maxValue])
-                    .range(['white','blue','red'])
+                    .range(['white','#FDFC96','green'])
             } else {
                 myColor = d3.scaleOrdinal()
                     .domain(['Organism Detected', 'Amplicon Detected', 'No Detection', 'NTC'])
@@ -297,7 +297,7 @@ export default {
                 const tickHeight = barHeight * 1.5
                 const xTicksLegend = [1, Math.round(maxValue / 2), maxValue]
 
-                const legendData = [{'color': '#0000FF', 'value': 1}, {'color': '#FF0000', 'value': maxValue}]
+                const legendData = [{'color': '#FDFC96', 'value': 1}, {'color': 'green', 'value': maxValue}]
                 const extent = d3.extent(legendData, d => d.value)
 
                 const xScaleLegend = d3.scaleLinear()

@@ -45,6 +45,41 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
+              v-model="refDirectory"
+              v-bind="attrs"
+              v-on="on"
+              label="Reference Database"
+              type="text"
+              :rules="[rules.required]"
+              required
+            ></v-text-field>
+          </template>
+          <span>
+            The reference directory must be the full path to the Amplicon database and prefix of the database created by blastn.
+            For example /home/database/Amplicon_blastdb/Amplicon_set. 
+          </span>
+        </v-tooltip>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              v-model="orgFile"
+              v-bind="attrs"
+              v-on="on"
+              label="Organism File"
+              type="text"
+              :rules="[rules.required]"
+              required
+            ></v-text-field>
+          </template>
+          <span>
+            The path to the organisms.sh file structure with all organism_IDs and names defined for parsing.
+          </span>
+        </v-tooltip>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
               v-model="barcodes"
               v-bind="attrs"
               v-on="on"
@@ -101,22 +136,26 @@
         </v-tooltip>
       </v-form>
     </v-card-text>
-    <v-spacer></v-spacer>
-    <v-card-actions>
-      <v-btn
-        color="primary"
-        :disabled="!valid"
-        @click="startAnalysis"
-      >
-        Start
-      </v-btn>
-      <v-btn
-        color="secondary"
-        @click="stopAnalysis"
-      >
-        Stop
-      </v-btn>
-    </v-card-actions>
+    <v-row class="mt-3">
+      <v-col>
+        <v-btn
+          color="success"
+          :disabled="!valid"
+          class="ml-6"
+          @click="startAnalysis"
+        >
+          Start
+        </v-btn>
+        <v-btn
+          color="error"
+          :disabled="!stopvalid"
+          class="ml-2"
+          @click="stopAnalysis"
+        >
+          Stop
+        </v-btn>
+      </v-col>
+    </v-row>
   </v-card>
 </template>
 
@@ -130,7 +169,10 @@ export default {
     },
     data: () => ({
         valid: true,
-        inputDirectory: '/app/EXAMPLE/fastq_pass/',
+        stopvalid: false,
+        inputDirectory: '/app/DATA/EXAMPLE_DEMO/fastq_pass/',
+        refDirectory: '/app/DATA/Amplicon_blastdb/Amplicon_set',
+        orgFile: '/app/DATA/organisms.sh',
         barcodes: 'barcode10,barcode11,barcode12',
         analysisInterval: '10',
         threads: '1',
@@ -146,6 +188,8 @@ export default {
 
           const data = {
             inputDirectory: this.inputDirectory,
+            refDirectory: this.refDirectory,
+            orgFile: this.orgFile,
             barcodeList: this.barcodes,
             analysisInterval: this.analysisInterval,
             numThreads: this.threads
@@ -161,6 +205,8 @@ export default {
             .catch(this.handleError)
         },
         handleSuccess(response) {
+            this.valid = false
+            this.stopvalid = true
             const data = response.data
             this.$emit('response', { message: data.message, type: 'success' })
         },
