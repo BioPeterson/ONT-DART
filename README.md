@@ -36,6 +36,7 @@ This section guides you through the process of setting up a custom database for 
 
 Before you begin, ensure you have the following installed:
 - `makeblastdb` (part of the BLAST software package)
+- Docker (https://docs.docker.com/get-docker/)
 
 ### Step 1: Create `organism.sh` File
 
@@ -67,22 +68,47 @@ Before you begin, ensure you have the following installed:
 
 ## Running ONT-DART Web Application in Development
 
-This is for testing out the ONT-DART web application on your machine for development purposes.
+This is for testing out the ONT-DART web application on your machine for development purposes or other use cases off the MK1C.
 
-Before going through the steps, make sure Docker is installed on your machine: https://docs.docker.com/get-docker/. You'll also need to have access to the ONT-DART accessory files for the blastn database. Copy the ONT-DART accessory files directory into the project's root directory.
+- Clone the repo and navigate to the project's root directory.
+1. **Build the Docker Image**:
+   - Run the following script to build the Docker image. This script bundles the frontend and backend applications into a Docker image named `ont-dart`:
+     ```bash
+     ./build_image.sh
+     ```
 
-- Open terminal and navigate to the project's root directory.
-- To build the Docker image for ONT-DART, run the following command: `./build_image.sh`. This will properly bundle the frontend and backend web application files together and create a Docker image with the name **ont-dart**.
-- Finally, to run the web application, run the following command (modify port and host url if needed/depending on system): `docker run  -p 5000:5000 ont-dart`. The web application can now be reached at the following URL: http://localhost:5000.
+2. **Run the Web Application**:
+   - Use the following command to run the web application. Replace `local_folder` with the directory path on your machine for app data, and `local_port` with the port you want to use for the web service:
+     ```bash
+     docker run -v /path/to/local_folder:/app/DATA -p local_port:5000 ont-dart
+     ```
+   - Access the web application via (modify localhost with ip address/hostname of your machine if needed): `http://localhost:local_port`
 
 ## Installing ONT-DART Web Application to MK1C
 
-Before going through the steps, make sure Docker is installed on your machine: https://docs.docker.com/get-docker/. You'll also need to have access to the ONT-DART accessory files for the blastn database. Copy the ONT-DART accessory files directory into the project's root directory.
+- Clone the repo and navigate to the project's root directory.
 
-- Open terminal and navigate to the project's root directory.
-- To build the Docker image for ONT-DART that is compatible with the MK1C, run the following command: `./build_and_save_image_arm64.sh`. This will generate a file named **ont-dart.tar.gz** in your current directory which is the ONT-DART Docker image that has been saved as a file.
-- Transfer the Docker image file to the MK1C. This can be done through methods like USB or SSH (user: minit, password: minit).
-- Through command line on the MK1C (through SSH), run the following command: `docker load < /path/to/file/ont-dart.tar.gz`. This will load the ONT-DART Docker image onto the MK1C.
+1. **Build and Save the Docker Image for MK1C**:
+   - Run the following command to build the Docker image compatible with the ARM64 architecture and save it as a tar.gz file:
+     ```bash
+     ./build_and_save_image_arm64.sh
+     ```
+
+2. **Transfer Files to MK1C**:
+   - Transfer the `ont-dart.tar.gz` image file, along with database files and the `organism.sh` script, to the MK1C using methods such as SSH.
+
+3. **Load the Docker Image on MK1C**:
+   - Connect to the MK1C via SSH and run the following command to load the Docker image:
+     ```bash
+     docker load < /path/to/ont-dart.tar.gz
+     ```
+
+4. **Run the Web Application on MK1C**:
+   - Replace `local_folder` with the directory path on MK1C for app data and `local_port` with your desired web service port:
+     ```bash
+     docker run -v /path/to/local_folder:/app/DATA -p local_port:5000 ont-dart
+     ```
+   - Access the web application via (modify MK1C-IP with hostname/ip address of MK1C you are using): `http://MK1C-IP:local_port`
 
 ## NOTES:
 	The target environment for this code is an Oxford Nanopore Technologies (ONT) MinION Mk1C,
