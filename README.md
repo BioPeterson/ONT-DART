@@ -78,7 +78,7 @@ This is for testing out the ONT-DART web application on your machine for develop
      ```
 
 2. **Run the Web Application**:
-   - Use the following command to run the web application. Replace `local_folder` with the directory path on your machine for app data, and `local_port` with the port you want to use for the web service:
+   - Use the following command to run the web application. Replace `local_folder` with the desired directory path on your machine for app data, and `local_port` with the port you want to use for the web service:
      ```bash
      docker run -v /path/to/local_folder:/app/DATA -p local_port:5000 ont-dart
      ```
@@ -104,7 +104,7 @@ This is for testing out the ONT-DART web application on your machine for develop
      ```
 
 4. **Run the Web Application on MK1C**:
-   - Replace `local_folder` with the directory path on MK1C for app data and `local_port` with your desired web service port:
+   - Replace `local_folder` with the desired directory path on MK1C for app data and `local_port` with your desired web service port:
      ```bash
      docker run -v /path/to/local_folder:/app/DATA -p local_port:5000 ont-dart
      ```
