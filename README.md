@@ -121,6 +121,7 @@ This is for testing out the ONT-DART web application on your machine for develop
 	- please index reference fasta with 'makeblastdb -dbtype nucl -in <FNA>'
 	- the input fastq_pass (-i) directory should have subfolders named for barcodes.
     - for this use-case, subfolder names are expected to be from 'barcode01' to 'barcode12'.
+	- fastqs must be uncompressed.
 
 ## Usage
 
