@@ -227,9 +227,14 @@ run nanomonitor:
     bash nanomonitor.sh -t 4 -a 20 -i ../fastq_pass/ -n barcode10,barcode11,barcode12 -r "$ref" -o ../testing_dart
 
 
-References:
+## References
 
-	1. O. Tange (2011): GNU Parallel - The Command-Line Power Tool, ;login: The USENIX Magazine, February 2011:42-47.
-    2. Altschul, S.F., Gish, W., Miller, W., Myers, E.W. & Lipman, D.J. (1990) "Basic local alignment search tool." J. Mol. Biol. 215:403-410. https://www.ncbi.nlm.nih.gov/pubmed/2231712?dopt=Citation
-	3. Player R, Verratti K, Staab A, Bradburne C, Grady S, Goodwin B, Sozhamannan S. Comparison of the performance of an amplicon sequencing assay based on Oxford Nanopore technology to real-time PCR assays for detecting bacterial biodefense pathogens. BMC Genomics. 2020 Feb 17;21(1):166. doi: 10.1186/s12864-020-6557-5. PMID: 32066372; PMCID: PMC7026984.
-	4. Player R, Verratti K, Staab A, Forsyth E, Ernlund A, Joshi MS, Dunning R, Rozak D, Grady S, Goodwin B, Sozhamannan S. Optimization of Oxford Nanopore Technology Sequencing Workflow for Detection of Amplicons in Real Time Using ONT-DART Tool. Genes (Basel). 2022 Oct 3;13(10):1785. doi: 10.3390/genes13101785. PMID: 36292670; PMCID: PMC9602318.
+1. Player R, Verratti K, Staab A, Bradburne C, Grady S, Goodwin B, Sozhamannan S. ["Comparison of the performance of an amplicon sequencing assay based on Oxford Nanopore technology to real-time PCR assays for detecting bacterial biodefense pathogens."](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-020-6557-5) BMC Genomics. 2020 Feb 17;21(1):166. doi: 10.1186/s12864-020-6557-5. PMID: 32066372; PMCID: PMC7026984.
+
+2. Player R, Verratti K, Staab A, Forsyth E, Ernlund A, Joshi MS, Dunning R, Rozak D, Grady S, Goodwin B, Sozhamannan S. ["Optimization of Oxford Nanopore Technology Sequencing Workflow for Detection of Amplicons in Real Time Using ONT-DART Tool."](https://www.mdpi.com/2073-4425/13/10/1785) Genes (Basel). 2022 Oct 3;13(10):1785. doi: 10.3390/genes13101785. PMID: 36292670; PMCID: PMC9602318.
+
+3. O. Tange (2011): [GNU Parallel - The Command-Line Power Tool](https://www.usenix.org/publications/login/february-2011-volume-36-number-1/gnu-parallel-command-line-power-tool), ;login: The USENIX Magazine, February 2011:42-47.
+
+4. Altschul, S.F., Gish, W., Miller, W., Myers, E.W. & Lipman, D.J. (1990) ["Basic local alignment search tool."](https://www.ncbi.nlm.nih.gov/pubmed/2231712?dopt=Citation) J. Mol. Biol. 215:403-410.
+
+**Note:** If you use this tool, please cite the first two publications from the list above.
