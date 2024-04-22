@@ -130,7 +130,7 @@ To begin the process, select the "Analysis" tab.
 
 ![](./imgs/analysis.png)
 
-The analysis form requires an input directory, NTC barcodes, analysis interval, and number of threads.
+The analysis form requires an input fastq directory, directory of reference database, path to organism.sh file, NTC barcodes, analysis interval, and number of threads.
 For more information on these fields, hover over them to see a tooltip description.
 
 Once ready, you can begin the analysis using the "Start" button at the bottom. Next to that is
