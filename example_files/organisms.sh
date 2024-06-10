@@ -13,17 +13,20 @@
 # CONSEQUENTIAL, SPECIAL OR OTHER DAMAGES ARISING FROM THE USE OF, OR INABILITY TO USE,
 # THE MATERIAL, INCLUDING, BUT NOT LIMITED TO, ANY DAMAGES FOR LOST PROFITS.
 
-ORGANISM_ID_1='Bce'
-ORGANISM_ID_2='Bc-nn'
-ORGANISM_ID_3='Bru'
-ORGANISM_ID_4='Br-nn'
-ORGANISM_ID_5='Brk'
-ORGANISM_ID_6='Bk-nn'
+declare -A ORGANISM_ID
+declare -A ORGANISM_NAME
 
-ORGANISM_NAME_1='Bacillis cereus'
-ORGANISM_NAME_2='Bacillis cereus near neighbor'
-ORGANISM_NAME_3='Brucells abortus'
-ORGANISM_NAME_4='Brucells abortus near neighbor'
-ORGANISM_NAME_5='Burkholderia cepacia'
-ORGANISM_NAME_6='Burkholderia cepacia near neighbor'
+ORGANISM_ID[1]='Bce'
+ORGANISM_ID[2]='Bc-nn'
+ORGANISM_ID[3]='Bru'
+ORGANISM_ID[4]='Br-nn'
+ORGANISM_ID[5]='Brk'
+ORGANISM_ID[6]='Bk-nn'
+
+ORGANISM_NAME[1]='Bacillis cereus'
+ORGANISM_NAME[2]='Bacillis cereus near neighbor'
+ORGANISM_NAME[3]='Brucells abortus'
+ORGANISM_NAME[4]='Brucells abortus near neighbor'
+ORGANISM_NAME[5]='Burkholderia cepacia'
+ORGANISM_NAME[6]='Burkholderia cepacia near neighbor'
 
