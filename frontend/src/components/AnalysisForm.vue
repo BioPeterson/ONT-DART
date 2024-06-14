@@ -14,7 +14,7 @@
   CONSEQUENTIAL, SPECIAL OR OTHER DAMAGES ARISING FROM THE USE OF, OR INABILITY TO USE,
   THE MATERIAL, INCLUDING, BUT NOT LIMITED TO, ANY DAMAGES FOR LOST PROFITS.
  -->
-<template>
+ <template>
   <v-card :height="height" class="d-flex flex-column">
     <v-card-title>Analysis Form</v-card-title>
     <v-card-text>
@@ -38,7 +38,6 @@
           <span>
             The input directory must be the full path to the 'fastq_pass' subfolder of an ONT sequencing run,
             and have sub-folders named for each demultiplexed (demux) barcode (this is default for demux by MinKNOW).
-            Currently, sub-folder names are expected to be from 'barcode01' to 'barcode12'.
           </span>
         </v-tooltip>
 
@@ -90,7 +89,7 @@
             ></v-text-field>
           </template>
           <span>
-            Additionally, one of the 12 barcodes is reserved for a NTC (nontemplate control).
+            Additionally, one or more of the barcodes is reserved for a NTC (nontemplate control).
             This is used for the final threshold for calling a positive amplicon (T3).
           </span>
         </v-tooltip>
@@ -134,28 +133,46 @@
             that the thread count be set no greater than half the total threads available on the system.
           </span>
         </v-tooltip>
+
+        <!-- New refThresh field -->
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              v-model="refThresh"
+              v-bind="attrs"
+              v-on="on"
+              label="Reference Alignment and Identity Threshold"
+              type="text"
+              :rules="[rules.required]"
+              required
+            ></v-text-field>
+          </template>
+          <span>
+            The reference alignment and identity threshold for considering a hit,
+            for example '90' means the amplicon read alignment must cover >= 90%  of the reference length and be >=90% the identity.
+          </span>
+        </v-tooltip>
+        
       </v-form>
     </v-card-text>
-    <v-row class="mt-3">
-      <v-col>
-        <v-btn
-          color="success"
-          :disabled="!valid"
-          class="ml-6"
-          @click="startAnalysis"
-        >
-          Start
-        </v-btn>
-        <v-btn
-          color="error"
-          :disabled="!stopvalid"
-          class="ml-2"
-          @click="stopAnalysis"
-        >
-          Stop
-        </v-btn>
-      </v-col>
-    </v-row>
+    <v-card-actions class="justify-end">
+      <v-btn
+        color="success"
+        :disabled="!valid"
+        class="ml-6"
+        @click="startAnalysis"
+      >
+        Start
+      </v-btn>
+      <v-btn
+        color="error"
+        :disabled="!stopvalid"
+        class="ml-2"
+        @click="stopAnalysis"
+      >
+        Stop
+      </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -170,12 +187,13 @@ export default {
     data: () => ({
         valid: true,
         stopvalid: false,
-        inputDirectory: '/app/DATA/EXAMPLE_DEMO/fastq_pass/',
+        inputDirectory: '/app/DATA/fastq_pass/',
         refDirectory: '/app/DATA/Amplicon_blastdb/Amplicon_set',
         orgFile: '/app/DATA/organisms.sh',
         barcodes: 'barcode10,barcode11,barcode12',
         analysisInterval: '10',
         threads: '1',
+        refThresh: '90',
         rules: {
           required: value => !!value && value.trim() !== '' || 'This field is required'
         }
@@ -192,7 +210,8 @@ export default {
             orgFile: this.orgFile,
             barcodeList: this.barcodes,
             analysisInterval: this.analysisInterval,
-            numThreads: this.threads
+            numThreads: this.threads,
+            refThresh: this.refThresh
           }
 
           AnalysisService.startAnalysis(data)
@@ -227,3 +246,5 @@ export default {
   max-width: 350px !important
 }
 </style>
+
+

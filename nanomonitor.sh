@@ -5,87 +5,6 @@
 
 #	FUNCTIONS
 #===============================================================================
-usage()
-{
-cat << EOF
-
-Help message for \`nanomonitor.sh\`:
-
-This algorithm is designed for a very specific amplicon use-case, and is part
-of the ONT-DART (Oxford Nanopore Technologies Detection of Amplicons in Real-Time) analysis pipeline.
-The input fastq_pass (-i) directory should have subfolders named for barcodes.
-For this use-case, subfolder names are expected to be from 'barcode01' to 'barcode12'.
-
-Non-Template Control (NTC) samples:
-	Three of the 12 barcodes (01 through 12) are reserved for NTCs.
-	Use (-n) parameter to indicate which barcodes were used for the NTCs (eg. barcode01,barcode02,barcode03).
-
-Positive detection thresholds will be indicated in comments where they occur:
-	T1. per read alignment thresholds (>=90% alignment identity and length)
-	T2. per sample threshold (>2% total aligned read count)
-	T3. per flow cell threshold (based on NTCs, amplicon called negative if:
-		(NTC mean+(3*stdev)) > (sample count)
-
-NOTES:
-	-
-	- dependencies: GNU Parallel [1], GNU Core Utils; see README.md for full list
-	- please index reference fasta with 'makeblastdb -dbtype nucl -in <FNA>'
-	- PRIMARY OUTPUT FORMAT: plot.tsv
-		1	barcode (e.g. barcode01)
-		2	sample type (sample or control)
-		3	<org>,<amplicon_id> (e.g. Org1,Org2)
-		4	amplicon aligned read count (INT)
-		5	proportion of flowcell total aligned reads
-		6	detection after T2: 1 if amplicon count >2% total aligned read count, 0 if not
-		7	mean NTC amplicon aligned read count
-		8	standard deviation NTC amplicon aligned read count
-		9	detection after T3: 1 if (col7+{3*col8}) > col4, 0 if not
-		10	final call for amplicon detection; see below
-					condition			final_call	description
-				if col6==0 && col9==0	negative	amplicon not detected in sample or control
-				if col6==0 && col9==1	negative	amplicon not detected in sample but was detected in control
-				if col6==1 && col9==0	positive	true positive, amplicon detected in sample but not control
-				if col6==1 && col9==1	negative	amplicon detected in sample and control
-		11	org code (e.g. Org1, Org2)
-		12	organism full name (e.g. Organism 1, Organism 2)
-		13	organism detection; 1 if all organism-associated amplicons are 'positive' (col10), 0 if not
-		14	number of organism associated amplicons
-		15	mean org associated amplicon read count
-
-
-	- SECONDARY OUTPUT FORMAT: org.tsv
-		1	barcode
-		2	org code (e.g. Org1, Org2)
-		3	org full name (e.g. Genus species)
-		4	detection (1 if all 'org associated amplicons are positive', 0 if not)
-		5	number of organism associated amplicons
-		6	mean org associated amplicon read count
-
-usage:
-bash nanomonitor.sh -t <INT> -a <INT> -i <DIR> -n <01-12> -r <FNA> -o <DIR>
-
-REQUIRED:
-	-h      show this message
-	-t	INT	num threads
-	-a	INT	analysis interval; number of seconds between analysis updates [10]
-	-i	DIR	input directory <path/to/rundir/fastq_pass> (MinKNOW output dir structure)
-	-n	STR	commas separated list of barcodes used for NTCs (eg. "barcode01,barcode02,barcode03")
-	-r	FNA	reference fasta used for blastn (please index with makeblastdb)
-	-o	DIR	output directory
-
-____________________________________________________________________________________________________
-References:
-	1. O. Tange (2011): GNU Parallel - The Command-Line Power Tool, ;login: The USENIX Magazine, February 2011:42-47.
-
-
-
-	example:
-
-
-EOF
-}
-
-
 getavgqual()
 {
 sed $'$!N;s/\\\n/\t/' "$1" | sed $'$!N;s/\\\n/\t/' 2> /dev/null | cut -f4 | awk 'BEGIN{
@@ -122,7 +41,7 @@ export -f getavgqual
 #	INPUTS & CHECKS & DEFAULTS
 #===============================================================================
 # parse args
-while getopts "ht:a:i:n:r:o:g:" OPTION
+while getopts "ht:a:i:n:r:o:g:f:" OPTION
 do
 	case $OPTION in
 		h) usage; exit 1;;
@@ -133,6 +52,7 @@ do
 		r) REF=$OPTARG;;
 		o) OUTDIR=$OPTARG;;
 		g) ORGANISMS_FILE=$OPTARG;;
+		f) REF_THRESH=$OPTARG;;
 		?) usage; exit;;
 	esac
 done
@@ -143,12 +63,12 @@ if [[ -z "$THREADS" ]]; then printf "%s\n" "Please specify number of threads (-t
 if [[ -z "$AINTERVAL" ]]; then AINTERVAL="1"; printf "%s\n" "Analysis interval (-a) set to 1 second default."; fi
 if [[ -z "$INDIR" ]]; then printf "%s\n" "Please specify input dir (-i)."; exit; fi
 if [[ ! -d "$INDIR" ]]; then printf "%s\n" "The input (-i) $INDIR directory does not exist."; exit; fi
-if [[ -z "$NEGATIVE" ]]; then printf "%s\n" "Please specify the 3 barcodes used for the negative control sample (-n)."; exit; fi
-# make sure there are 3 and only 3 unique barcodes in the comma separated argument
+if [[ -z "$NEGATIVE" ]]; then printf "%s\n" "Please specify the barcodes used for the negative control sample (-n)."; exit; fi
+# make sure there is at least 1 unique barcode in the comma separated argument
 ntc=$(printf "$NEGATIVE" | sed 's/,/\n/g' | sort | uniq | wc -l)
-if [[ "$ntc" != 3 ]]; then
-	printf "%s\n" "3 barcodes must be specified for the NTC set, $ntc were provided"
-	#exit
+if [[ "$ntc" -lt 1 ]]; then
+	printf "%s\n" "At least 1 barcode must be specified for the NTC set, $ntc were provided"
+	exit
 fi
 # fix formatting (remove white spaces)
 negtmp="$NEGATIVE"
@@ -162,6 +82,7 @@ if [[ -z "$OUTDIR" ]]; then printf "%s\n" "Please specify an output directory (-
 if [[ -d "$OUTDIR" ]]; then printf "%s\n" "The output directory (-o) already exists."; exit; fi
 if [[ -z "$ORGANISMS_FILE" ]]; then printf "%s\n" "Please specify the path to the organisms.sh file (-g)."; exit; fi
 if [[ ! -f "$ORGANISMS_FILE" ]]; then printf "%s\n" "The specified organisms.sh file (-g) does not exist."; exit; fi
+if [[ -z "$REF_THRESH" ]]; then printf "%s\n" "Please specify the reference alignment and identity threshold (-f)."; exit; fi
 
 # setup defaults
 runtime=$(date +"%Y%m%d%H%M%S%N")
@@ -207,14 +128,14 @@ while [[ "$maxtime" -ge "$monitorcounts" ]]; do
 		mkdir -p "$wd"
 
 
-		find "$d" -name "*.fastq" | sort -V | while read fq; do
+		find "$d" -name "*.fastq*" | sort -V | while read fq; do
 			bnfq=$(basename "$fq")
 #			echo "$bnfq"
 			ln -s "$fq" "$OUTDIR/$bc/$bnfq" 2> /dev/null
 
 #>			# T1. per read alignment thresholds
 			# evaluate with blastn script
-			bash $scriptdir/align.sh "$OUTDIR/$bc/$bnfq" "$REF" "$THREADS"
+			bash $scriptdir/align.sh "$OUTDIR/$bc/$bnfq" "$REF" "$THREADS" "$REF_THRESH"
 			# if output dir from 'align.sh' already exists,
 			# analysis for file will be skipped (faster performance)
 		done
@@ -415,15 +336,5 @@ while [[ "$maxtime" -ge "$monitorcounts" ]]; do
 	monitorcounts=$(printf "$mcount" | awk -v x="$AINTERVAL" '{print($0*x)}')
 
 done
-
-
-
-
-
-
-
-
-
-
 
 
